@@ -21,7 +21,7 @@
         android:id="@+id/parameter_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/parameter"
+        android:text="@string/initial_value"
         android:textSize="25sp"
         android:layout_margin="5dp"
         app:layout_constraintEnd_toEndOf="parent"

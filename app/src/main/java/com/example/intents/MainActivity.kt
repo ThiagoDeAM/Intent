@@ -1,5 +1,6 @@
 package com.example.intents
 
+import android.app.ComponentCaller
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -9,9 +10,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.intents.Extras.PARAMETER_EXTRA
 import com.example.intents.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val PARAMETER_REQUEST_CODE = 0
+    }
+
     private val amb: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
@@ -23,9 +29,11 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.subtitle = localClassName
 
         amb.parameterBt.setOnClickListener{
-            //Intent explicita porque a classe que será executada para tratar a Intent
+            //Intent explicita porque define a classe que será executada para tratar a Intent
             Intent(this, ParameterActivity::class.java).let {
-                startActivity(it)
+                // Colocando o valor na Intent
+                it.putExtra(PARAMETER_EXTRA, amb.parameterTv.text.toString())
+                startActivityForResult(it, PARAMETER_REQUEST_CODE)
             }
 
         }
@@ -49,6 +57,22 @@ class MainActivity : AppCompatActivity() {
             R.id.pick_mi -> { true }
             R.id.chooser_mi -> { true }
             else -> { false }
+        }
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            if(requestCode == PARAMETER_REQUEST_CODE) {
+                // Recebendo o valor devolvido pela ParameterActivity
+                data?.getStringExtra(PARAMETER_EXTRA).let {
+                    amb.parameterTv.text = it
+                }
+            }
         }
     }
 }
