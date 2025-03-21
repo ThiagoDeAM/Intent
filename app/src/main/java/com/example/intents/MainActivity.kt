@@ -1,7 +1,6 @@
 package com.example.intents
 
 import android.Manifest.permission.CALL_PHONE
-import android.app.ComponentCaller
 import android.content.Intent
 import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_CHOOSER
@@ -18,13 +17,9 @@ import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.intents.Extras.PARAMETER_EXTRA
 import com.example.intents.databinding.ActivityMainBinding
 
@@ -48,7 +43,7 @@ class MainActivity : AppCompatActivity() {
             //Intent implicita porque não define a classe que será executada para tratar a Intent
             //Deixa a cargo do SO escolher a Activity com base no IntentFilter
             Intent("OPEN_PARAMETER_ACTIVITY_ACTION").let {
-                // Colocando o valor na Intent
+                // Colocando o valor na Intent que será enviada para a ParameterActivity
                 it.putExtra(PARAMETER_EXTRA, amb.parameterTv.text.toString())
                 parameterArl.launch(it)
             }
@@ -71,19 +66,18 @@ class MainActivity : AppCompatActivity() {
                 callPhone(true)
             }
             else {
-                Toast.makeText(this, "Permission required to call a number!",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    "Permission required to call a number!",
+                    Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
         pickImageArl = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result ->
-            //Recebendo URI do arquivo
+            //Recebendo URI do arquivo selecionado e abrindo em outro aplicativo para visualização (galeria)
             if(result.resultCode == RESULT_OK){
                 startActivity(Intent(ACTION_VIEW, result.data?.data))
-                val imageUri = result.data?.data
-                val imageIntent = Intent(ACTION_VIEW, imageUri)
-                startActivity(imageIntent)
             }
         }
     }
@@ -101,9 +95,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.view_mi -> {
-                val url = Uri.parse(amb.parameterTv.text.toString())
-                val browserIntent = Intent(ACTION_VIEW, url)
-                startActivity(browserIntent)
+                startActivity(browserIntent())
                 true
             }
             R.id.call_mi -> {
@@ -119,7 +111,6 @@ class MainActivity : AppCompatActivity() {
                 else {
                     callPhone(true)
                 }
-
                 true
             }
             R.id.dial_mi -> {
@@ -148,13 +139,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun callPhone(call: Boolean) {
-        val number = "Tel: ${amb.parameterTv.text}"
+        val number = "tel: ${amb.parameterTv.text}"
         val callIntent = Intent(if (call) ACTION_CALL else ACTION_DIAL)
         callIntent.data = Uri.parse(number)
         startActivity(callIntent)
     }
 
     private fun browserIntent(): Intent{
-
+        val url = Uri.parse(amb.parameterTv.text.toString())
+        return Intent(ACTION_VIEW, url)
     }
 }
